@@ -1,0 +1,77 @@
+# ========================================
+# E-Commerce System - Root .gitignore
+# ========================================
+
+# Backend
+backend/node_modules/
+backend/.env
+backend/.env.*
+backend/dist/
+backend/build/
+backend/logs/
+backend/uploads/
+backend/*.log
+
+# Frontend (khi tạo sau này)
+frontend/node_modules/
+frontend/.env
+frontend/.env.*
+frontend/dist/
+frontend/build/
+frontend/.next/
+frontend/out/
+frontend/.nuxt/
+frontend/.output/
+
+# ========================================
+# Global Ignores
+# ========================================
+
+# Dependencies
+**/node_modules/
+**/bower_components/
+
+# Environment Variables
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Build Output
+**/dist/
+**/build/
+**/out/
+
+# Logs
+**/*.log
+**/logs/
+
+# OS Files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+*.sql
+
+# Temporary
+**/tmp/
+**/temp/
+**/*.tmp
+
+# Uploads
+**/uploads/
+**/storage/
+
+# Security
+**/*.pem
+**/*.key
+**/*.cert
+**/secrets/

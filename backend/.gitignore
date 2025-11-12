@@ -1,0 +1,228 @@
+# ========================================
+# Node.js Dependencies
+# ========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ========================================
+# Environment Variables (CRITICAL!)
+# ========================================
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+
+# ========================================
+# Build Output
+# ========================================
+dist/
+build/
+out/
+*.tsbuildinfo
+.cache/
+
+# ========================================
+# IDE & Editors
+# ========================================
+# VS Code
+.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# WebStorm / IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ========================================
+# OS Files
+# ========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.Trash-*
+
+# ========================================
+# Logs
+# ========================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ========================================
+# Testing
+# ========================================
+coverage/
+.nyc_output/
+*.lcov
+.coverage
+.pytest_cache/
+junit.xml
+
+# ========================================
+# Database
+# ========================================
+# SQLite
+*.sqlite
+*.sqlite3
+*.db
+
+# MySQL dumps
+*.sql
+*.dump
+
+# Database backups
+database-backup/
+db-backup/
+
+# ========================================
+# Temporary Files
+# ========================================
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.swp
+
+# ========================================
+# Uploads & User Content
+# ========================================
+uploads/
+public/uploads/
+storage/
+!public/uploads/.gitkeep
+
+# ========================================
+# Security & Secrets
+# ========================================
+# SSL Certificates
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+
+# JWT Secrets (if stored as files)
+secrets/
+*.secret
+
+# API Keys
+.api-keys
+credentials.json
+
+# ========================================
+# Documentation (Generated)
+# ========================================
+docs/generated/
+api-docs/generated/
+
+# ========================================
+# Package Manager
+# ========================================
+.npm
+.yarn
+.pnp.*
+.pnp.js
+
+# ========================================
+# Miscellaneous
+# ========================================
+.eslintcache
+.stylelintcache
+*.orig
+.sass-cache/
+connect.lock
+typings/
+
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Optional npm cache
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing
+.vscode-test
+
+# ========================================
+# Project Specific
+# ========================================
+# Test files (không push test scripts)
+test-*.js
+*.test.local.js
+
+# Local development files
+dev-notes.md
+TODO-local.md
+scratch/
