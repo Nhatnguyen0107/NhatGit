@@ -6,6 +6,12 @@ import sequelize, { testConnection } from './config/index.js';
 // Import routes
 import authRoutes from './routes/auth.routes.js';
 import testRoutes from './routes/test.routes.js';
+import productRoutes from './routes/product.routes.js';
+import categoryRoutes from './routes/category.routes.js';
+import cartRoutes from './routes/cart.routes.js';
+import checkoutRoutes from './routes/checkout.routes.js';
+import orderRoutes from './routes/order.routes.js';
+import customerRoutes from './routes/customer.routes.js';
 
 dotenv.config();
 
@@ -17,6 +23,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files (uploads)
+app.use('/uploads', express.static('uploads'));
+
 // Health check route
 app.get('/', (req, res) => {
     res.json({
@@ -26,6 +35,12 @@ app.get('/', (req, res) => {
         endpoints: {
             health: '/api/health',
             auth: '/api/auth',
+            products: '/api/products',
+            categories: '/api/categories',
+            cart: '/api/cart',
+            checkout: '/api/checkout',
+            orders: '/api/orders',
+            customers: '/api/customers',
             test: '/api/test'
         }
     });
@@ -43,6 +58,12 @@ app.get('/api/health', async (req, res) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/checkout', checkoutRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/customers', customerRoutes);
 app.use('/api/test', testRoutes);
 
 // 404 Handler
