@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import CancelOrderModal from '../components/CancelOrderModal';
+import { formatPrice } from '@/utils/formatPrice';
 
 interface OrderItem {
     id: number;
@@ -65,13 +66,6 @@ const OrderDetailPage: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    };
-
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(price);
     };
 
     const formatDate = (dateString: string) => {

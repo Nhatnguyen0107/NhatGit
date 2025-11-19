@@ -9,7 +9,9 @@
         "start": "node src/server.js",
         "migrate": "node src/sync-db.js",
         "seed": "node src/seed.js",
-        "fresh": "node src/sync-db.js && node src/seed.js"
+        "fresh": "node src/sync-db.js && node src/seed.js",
+        "create-profiles": "node src/scripts/create-customer-profiles.js",
+        "add-avatar": "node src/scripts/add-avatar-column.js"
     },
     "keywords": [
         "ecommerce",

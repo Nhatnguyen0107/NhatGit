@@ -16,7 +16,9 @@ import {
   OrderDetailPage,
   LoginPage,
   RegisterPage,
+  ProfilePage,
 } from '@/pages';
+import SearchPage from '@/pages/SearchPage';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import UserManagement from '@/pages/admin/UserManagement';
 import ProductManagement from '@/pages/admin/ProductManagement';
@@ -38,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: 'products/:id',
         element: <ProductDetailPage />,
+      },
+      {
+        path: 'search',
+        element: <SearchPage />,
       },
       {
         path: 'login',
@@ -76,6 +82,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <OrderListPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'profile',
+        element: (
+          <PrivateRoute>
+            <ProfilePage />
           </PrivateRoute>
         ),
       },

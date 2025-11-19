@@ -2,9 +2,11 @@ import { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '@/services';
 import { LoginCredentials } from '@/types';
+import { useAvatar } from '@/contexts/AvatarContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { refreshProfile } = useAvatar();
   const [formData, setFormData] = useState<LoginCredentials>({
     email: '',
     password: '',
@@ -29,6 +31,9 @@ const LoginPage = () => {
       const response = await authService.login(formData);
 
       if (response.success) {
+        // Refresh profile to get updated user info
+        await refreshProfile();
+
         // Redirect dựa trên role
         const role = authService.getRole();
         if (role?.toLowerCase() === 'admin') {

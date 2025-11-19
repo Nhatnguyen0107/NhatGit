@@ -40,6 +40,11 @@ const User = sequelize.define('User', {
     last_login: {
         type: DataTypes.DATE,
         allowNull: true
+    },
+    avatar: {
+        type: DataTypes.STRING(500),
+        allowNull: true,
+        comment: 'URL to user avatar image'
     }
 }, {
     tableName: 'users',

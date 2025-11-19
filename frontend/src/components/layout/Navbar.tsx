@@ -1,17 +1,28 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '@/services';
+import { useAvatar } from '@/contexts/AvatarContext';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const { avatar, username: contextUsername } = useAvatar();
   const isAuthenticated = authService.isAuthenticated();
   const isAdmin = authService.isAdmin();
-  const username = authService.getUsername();
+  const username = contextUsername || authService.getUsername();
 
   const handleLogout = () => {
     authService.logout();
     navigate('/login');
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchKeyword.trim()) {
+      navigate(`/search?keyword=${encodeURIComponent(searchKeyword.trim())}`);
+      setSearchKeyword('');
+    }
   };
 
   return (
@@ -28,9 +39,11 @@ const Navbar = () => {
 
           {/* Search Bar */}
           <div className="flex-1 max-w-xl mx-8">
-            <div className="relative">
+            <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
                 placeholder="Tìm kiếm sản phẩm..."
                 className="w-full px-4 py-2 pl-10 pr-4 
                            border border-gray-300 rounded-lg 
@@ -38,22 +51,28 @@ const Navbar = () => {
                            focus:ring-blue-500 
                            focus:border-transparent"
               />
-              <svg
+              <button
+                type="submit"
                 className="absolute left-3 top-1/2 
-                           transform -translate-y-1/2 
-                           w-5 h-5 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+                           transform -translate-y-1/2"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
+                <svg
+                  className="w-5 h-5 text-gray-400 
+                             hover:text-blue-600 
+                             transition-colors"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </button>
+            </form>
           </div>
 
           {/* Navigation Links */}
@@ -103,10 +122,26 @@ const Navbar = () => {
                   className="flex items-center space-x-2 
                              focus:outline-none"
                 >
-                  <div className="w-9 h-9 bg-blue-500 
+                  {avatar ? (
+                    <img
+                      src={`http://localhost:3000${avatar}`}
+                      alt="Avatar"
+                      className="w-9 h-9 rounded-full object-cover 
+                               border-2 border-blue-500"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                        const fallback = (e.target as HTMLImageElement).nextElementSibling;
+                        if (fallback) {
+                          (fallback as HTMLElement).style.display = 'flex';
+                        }
+                      }}
+                    />
+                  ) : null}
+                  <div className={`w-9 h-9 bg-blue-500 
                                   rounded-full flex 
                                   items-center justify-center 
-                                  text-white font-semibold">
+                                  text-white font-semibold ${avatar ? 'hidden' : ''
+                    }`}>
                     {username?.charAt(0).toUpperCase()}
                   </div>
                   <span className="text-gray-700 font-medium">

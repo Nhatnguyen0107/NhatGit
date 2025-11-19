@@ -45,7 +45,8 @@ class CustomerRepository {
         if (search) {
             where[Op.or] = [
                 { phone: { [Op.like]: `%${search}%` } },
-                { address: { [Op.like]: `%${search}%` } }
+                { shipping_address: { [Op.like]: `%${search}%` } },
+                { billing_address: { [Op.like]: `%${search}%` } }
             ];
         }
 
@@ -80,8 +81,7 @@ class CustomerRepository {
                 attributes: [
                     'id',
                     'username',
-                    'email',
-                    'full_name'
+                    'email'
                 ]
             });
         }

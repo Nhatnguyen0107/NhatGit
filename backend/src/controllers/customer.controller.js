@@ -165,6 +165,219 @@ class CustomerController {
             });
         }
     }
+
+    async getMyProfile(req, res) {
+        try {
+            const userId = req.user.id;
+            const profile = await this.service.getMyProfile(userId);
+
+            res.status(200).json({
+                success: true,
+                data: profile
+            });
+        } catch (error) {
+            console.error('❌ Error in getMyProfile:', error);
+            if (error.message === 'Customer profile not found') {
+                return res.status(404).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+            res.status(500).json({
+                success: false,
+                message: 'Failed to get profile',
+                error: error.message
+            });
+        }
+    }
+
+    async updateMyProfile(req, res) {
+        try {
+            const userId = req.user.id;
+            const profile = await this.service.updateMyProfile(
+                userId,
+                req.body
+            );
+
+            res.status(200).json({
+                success: true,
+                message: 'Profile updated successfully',
+                data: profile
+            });
+        } catch (error) {
+            console.error('❌ Error in updateMyProfile:', error);
+
+            if (error.message === 'Customer profile not found') {
+                return res.status(404).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+
+            if (error.message === 'Phone number already in use') {
+                return res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+
+            res.status(500).json({
+                success: false,
+                message: 'Failed to update profile',
+                error: error.message
+            });
+        }
+    }
+
+    async changePassword(req, res) {
+        try {
+            const userId = req.user.id;
+            const { currentPassword, newPassword } = req.body;
+
+            if (!currentPassword || !newPassword) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Current password and new password are required'
+                });
+            }
+
+            if (newPassword.length < 6) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'New password must be at least 6 characters'
+                });
+            }
+
+            const result = await this.service.changePassword(
+                userId,
+                currentPassword,
+                newPassword
+            );
+
+            res.status(200).json({
+                success: true,
+                message: result.message
+            });
+        } catch (error) {
+            console.error('❌ Error in changePassword:', error);
+
+            if (error.message === 'User not found') {
+                return res.status(404).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+
+            if (error.message === 'Current password is incorrect') {
+                return res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+
+            res.status(500).json({
+                success: false,
+                message: 'Failed to change password',
+                error: error.message
+            });
+        }
+    }
+
+    async uploadAvatar(req, res) {
+        try {
+            const userId = req.user.id;
+
+            if (!req.file) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'No file uploaded'
+                });
+            }
+
+            // Generate avatar URL path
+            const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+
+            const profile = await this.service.updateAvatar(
+                userId,
+                avatarUrl
+            );
+
+            res.status(200).json({
+                success: true,
+                message: 'Avatar uploaded successfully',
+                data: profile
+            });
+        } catch (error) {
+            console.error('❌ Error in uploadAvatar:', error);
+
+            if (error.message === 'User not found') {
+                return res.status(404).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+
+            res.status(500).json({
+                success: false,
+                message: 'Failed to update avatar',
+                error: error.message
+            });
+        }
+    }
+
+    async updateUsername(req, res) {
+        try {
+            const userId = req.user.id;
+            const { username } = req.body;
+
+            if (!username || !username.trim()) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Username is required'
+                });
+            }
+
+            if (username.length < 3) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Username must be at least 3 characters'
+                });
+            }
+
+            const profile = await this.service.updateUsername(
+                userId,
+                username.trim()
+            );
+
+            res.status(200).json({
+                success: true,
+                message: 'Username updated successfully',
+                data: profile
+            });
+        } catch (error) {
+            console.error('❌ Error in updateUsername:', error);
+
+            if (error.message === 'User not found') {
+                return res.status(404).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+
+            if (error.message === 'Username already taken') {
+                return res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+
+            res.status(500).json({
+                success: false,
+                message: 'Failed to update username',
+                error: error.message
+            });
+        }
+    }
 }
 
 export default CustomerController;

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { formatPrice } from '@/utils/formatPrice';
 
 interface ProductInfoProps {
     product: {
@@ -25,13 +26,6 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
     const finalPrice = product.discount_percentage > 0
         ? product.price * (1 - product.discount_percentage / 100)
         : product.price;
-
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(price);
-    };
 
     const handleQuantityChange = (change: number) => {
         const newQuantity = quantity + change;

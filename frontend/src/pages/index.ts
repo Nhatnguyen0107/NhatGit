@@ -7,3 +7,4 @@ export { default as OrderListPage } from './OrderListPage';
 export { default as OrderDetailPage } from './OrderDetailPage';
 export { default as LoginPage } from './LoginPage';
 export { default as RegisterPage } from './RegisterPage';
+export { default as ProfilePage } from './ProfilePage';

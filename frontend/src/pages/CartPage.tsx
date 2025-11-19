@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { formatPrice } from '@/utils/formatPrice';
 
 interface CartItem {
     id: string;
@@ -93,13 +94,6 @@ const CartPage: React.FC = () => {
                 : item.product.price;
             return total + (price * item.quantity);
         }, 0);
-    };
-
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(price);
     };
 
     const getImageUrl = (url: string) => {
