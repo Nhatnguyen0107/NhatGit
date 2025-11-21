@@ -9,7 +9,6 @@ backend/.env.*
 backend/dist/
 backend/build/
 backend/logs/
-backend/uploads/
 backend/*.log
 
 # Frontend (khi tạo sau này)
