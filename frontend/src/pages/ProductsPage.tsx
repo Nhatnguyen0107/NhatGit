@@ -192,208 +192,210 @@ const ProductsPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Danh sách sản phẩm
-        </h1>
-        <p className="text-gray-600">
-          Khám phá các sản phẩm điện tử chất lượng cao
-        </p>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Danh sách sản phẩm
+          </h1>
+          <p className="text-gray-600">
+            Khám phá các sản phẩm điện tử chất lượng cao
+          </p>
+        </div>
 
-      {/* Search Bar */}
-      <div className="mb-6">
-        <form onSubmit={handleSearchSubmit} className="flex gap-2">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Tìm kiếm sản phẩm..."
-            className="flex-1 px-4 py-2 border border-gray-300 
+        {/* Search Bar */}
+        <div className="mb-6">
+          <form onSubmit={handleSearchSubmit} className="flex gap-2">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Tìm kiếm sản phẩm..."
+              className="flex-1 px-4 py-2 border border-gray-300 
                        rounded-lg focus:outline-none 
                        focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700 
+            />
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 
                        text-white px-6 py-2 rounded-lg 
                        font-semibold transition-colors"
-          >
-            Tìm kiếm
-          </button>
-        </form>
-      </div>
+            >
+              Tìm kiếm
+            </button>
+          </form>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Sidebar Filters */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-md p-6 
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Sidebar Filters */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-md p-6 
                           sticky top-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">Bộ lọc</h2>
-              <button
-                onClick={clearFilters}
-                className="text-sm text-blue-600 
-                           hover:underline"
-              >
-                Xóa lọc
-              </button>
-            </div>
-
-            {/* Category Filter */}
-            <div className="mb-6">
-              <h3 className="font-semibold mb-3">Danh mục</h3>
-              <div className="space-y-2">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold">Bộ lọc</h2>
                 <button
-                  onClick={() => handleCategoryChange('all')}
-                  className={`w-full text-left px-3 py-2 
-                             rounded-lg transition-colors ${selectedCategory === 'all'
-                      ? 'bg-blue-600 text-white'
-                      : 'hover:bg-gray-100'
-                    }`}
+                  onClick={clearFilters}
+                  className="text-sm text-blue-600 
+                           hover:underline"
                 >
-                  Tất cả
+                  Xóa lọc
                 </button>
-                {categories.map((category) => (
+              </div>
+
+              {/* Category Filter */}
+              <div className="mb-6">
+                <h3 className="font-semibold mb-3">Danh mục</h3>
+                <div className="space-y-2">
                   <button
-                    key={category.id}
-                    onClick={() =>
-                      handleCategoryChange(category.id.toString())
-                    }
+                    onClick={() => handleCategoryChange('all')}
                     className={`w-full text-left px-3 py-2 
-                               rounded-lg transition-colors ${selectedCategory ===
-                        category.id.toString()
+                             rounded-lg transition-colors ${selectedCategory === 'all'
                         ? 'bg-blue-600 text-white'
                         : 'hover:bg-gray-100'
                       }`}
                   >
-                    {category.name}
+                    Tất cả
                   </button>
-                ))}
+                  {categories.map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() =>
+                        handleCategoryChange(category.id.toString())
+                      }
+                      className={`w-full text-left px-3 py-2 
+                               rounded-lg transition-colors ${selectedCategory ===
+                          category.id.toString()
+                          ? 'bg-blue-600 text-white'
+                          : 'hover:bg-gray-100'
+                        }`}
+                    >
+                      {category.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Range Filter */}
+              <div className="mb-6">
+                <h3 className="font-semibold mb-3">Khoảng giá</h3>
+                <select
+                  value={priceRange}
+                  onChange={handlePriceRangeChange}
+                  className="w-full px-3 py-2 border 
+                           border-gray-300 rounded-lg 
+                           focus:outline-none 
+                           focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">Tất cả</option>
+                  <option value="under-5m">Dưới 5 triệu</option>
+                  <option value="5m-10m">5 - 10 triệu</option>
+                  <option value="10m-20m">10 - 20 triệu</option>
+                  <option value="over-20m">Trên 20 triệu</option>
+                </select>
+              </div>
+
+              {/* Sort Filter */}
+              <div>
+                <h3 className="font-semibold mb-3">Sắp xếp</h3>
+                <select
+                  value={sortBy}
+                  onChange={handleSortChange}
+                  className="w-full px-3 py-2 border 
+                           border-gray-300 rounded-lg 
+                           focus:outline-none 
+                           focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="newest">Mới nhất</option>
+                  <option value="price-asc">Giá: Thấp → Cao</option>
+                  <option value="price-desc">Giá: Cao → Thấp</option>
+                  <option value="name-asc">Tên: A → Z</option>
+                  <option value="name-desc">Tên: Z → A</option>
+                </select>
               </div>
             </div>
-
-            {/* Price Range Filter */}
-            <div className="mb-6">
-              <h3 className="font-semibold mb-3">Khoảng giá</h3>
-              <select
-                value={priceRange}
-                onChange={handlePriceRangeChange}
-                className="w-full px-3 py-2 border 
-                           border-gray-300 rounded-lg 
-                           focus:outline-none 
-                           focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">Tất cả</option>
-                <option value="under-5m">Dưới 5 triệu</option>
-                <option value="5m-10m">5 - 10 triệu</option>
-                <option value="10m-20m">10 - 20 triệu</option>
-                <option value="over-20m">Trên 20 triệu</option>
-              </select>
-            </div>
-
-            {/* Sort Filter */}
-            <div>
-              <h3 className="font-semibold mb-3">Sắp xếp</h3>
-              <select
-                value={sortBy}
-                onChange={handleSortChange}
-                className="w-full px-3 py-2 border 
-                           border-gray-300 rounded-lg 
-                           focus:outline-none 
-                           focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="newest">Mới nhất</option>
-                <option value="price-asc">Giá: Thấp → Cao</option>
-                <option value="price-desc">Giá: Cao → Thấp</option>
-                <option value="name-asc">Tên: A → Z</option>
-                <option value="name-desc">Tên: Z → A</option>
-              </select>
-            </div>
           </div>
-        </div>
-
-        {/* Products Grid */}
-        <div className="lg:col-span-3">
-          {/* Results Info */}
-          <div className="flex items-center justify-between mb-6">
-            <p className="text-gray-600">
-              Tìm thấy <span className="font-semibold">
-                {products.length}
-              </span> sản phẩm
-            </p>
-          </div>
-
-          {/* Loading State */}
-          {loading && (
-            <div className="flex justify-center items-center 
-                            py-12">
-              <div className="animate-spin rounded-full 
-                              h-12 w-12 border-b-2 
-                              border-blue-600"></div>
-            </div>
-          )}
-
-          {/* Error State */}
-          {error && (
-            <div className="bg-red-50 border border-red-200 
-                            text-red-700 px-4 py-3 rounded 
-                            mb-6">
-              {error}
-            </div>
-          )}
-
-          {/* Empty State */}
-          {!loading && !error && products.length === 0 && (
-            <div className="text-center py-12">
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400 mb-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                />
-              </svg>
-              <h3 className="text-lg font-semibold 
-                             text-gray-900 mb-2">
-                Không tìm thấy sản phẩm
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm
-              </p>
-              <button
-                onClick={clearFilters}
-                className="text-blue-600 hover:underline 
-                           font-semibold"
-              >
-                Xóa bộ lọc
-              </button>
-            </div>
-          )}
 
           {/* Products Grid */}
-          {!loading && !error && products.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 
-                            lg:grid-cols-3 gap-6">
-              {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  name={product.name}
-                  price={product.price}
-                  image={product.image_url}
-                  stock={product.stock_quantity}
-                />
-              ))}
+          <div className="lg:col-span-3">
+            {/* Results Info */}
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-gray-600">
+                Tìm thấy <span className="font-semibold">
+                  {products.length}
+                </span> sản phẩm
+              </p>
             </div>
-          )}
+
+            {/* Loading State */}
+            {loading && (
+              <div className="flex justify-center items-center 
+                            py-12">
+                <div className="animate-spin rounded-full 
+                              h-12 w-12 border-b-2 
+                              border-blue-600"></div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 
+                            text-red-700 px-4 py-3 rounded 
+                            mb-6">
+                {error}
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!loading && !error && products.length === 0 && (
+              <div className="text-center py-12">
+                <svg
+                  className="mx-auto h-12 w-12 text-gray-400 mb-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                  />
+                </svg>
+                <h3 className="text-lg font-semibold 
+                             text-gray-900 mb-2">
+                  Không tìm thấy sản phẩm
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm
+                </p>
+                <button
+                  onClick={clearFilters}
+                  className="text-blue-600 hover:underline 
+                           font-semibold"
+                >
+                  Xóa bộ lọc
+                </button>
+              </div>
+            )}
+
+            {/* Products Grid */}
+            {!loading && !error && products.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 
+                            lg:grid-cols-3 gap-6">
+                {products.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    id={product.id}
+                    name={product.name}
+                    price={product.price}
+                    image={product.image_url}
+                    stock={product.stock_quantity}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

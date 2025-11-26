@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 const Footer = () => {
   return (
     <footer className="bg-gray-800 text-white mt-auto">
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About Section */}
           <div>
@@ -11,7 +11,7 @@ const Footer = () => {
               E-Commerce
             </h3>
             <p className="text-gray-300 text-sm">
-              Your one-stop shop for quality products at 
+              Your one-stop shop for quality products at
               great prices.
             </p>
           </div>
@@ -23,8 +23,8 @@ const Footer = () => {
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link 
-                  to="/products" 
+                <Link
+                  to="/products"
                   className="text-gray-300 hover:text-white 
                              transition-colors"
                 >
@@ -32,8 +32,8 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/cart" 
+                <Link
+                  to="/cart"
                   className="text-gray-300 hover:text-white 
                              transition-colors"
                 >
@@ -41,8 +41,8 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/orders" 
+                <Link
+                  to="/orders"
                   className="text-gray-300 hover:text-white 
                              transition-colors"
                 >
@@ -59,8 +59,8 @@ const Footer = () => {
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link 
-                  to="/contact" 
+                <Link
+                  to="/contact"
                   className="text-gray-300 hover:text-white 
                              transition-colors"
                 >
@@ -68,8 +68,8 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/faq" 
+                <Link
+                  to="/faq"
                   className="text-gray-300 hover:text-white 
                              transition-colors"
                 >
@@ -77,8 +77,8 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/shipping" 
+                <Link
+                  to="/shipping"
                   className="text-gray-300 hover:text-white 
                              transition-colors"
                 >
@@ -102,12 +102,12 @@ const Footer = () => {
         </div>
 
         {/* Copyright */}
-        <div 
+        <div
           className="border-t border-gray-700 mt-8 pt-6 
                      text-center text-sm text-gray-400"
         >
           <p>
-            © {new Date().getFullYear()} E-Commerce. 
+            © {new Date().getFullYear()} E-Commerce.
             All rights reserved.
           </p>
         </div>

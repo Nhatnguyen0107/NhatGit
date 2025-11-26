@@ -27,7 +27,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white shadow-md">
-      <div className="container mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link
@@ -76,7 +76,7 @@ const Navbar = () => {
           </div>
 
           {/* Navigation Links */}
-          <div className="hidden md:flex space-x-6">
+          <div className="hidden md:flex space-x-8">
             <Link
               to="/"
               className="text-gray-700 hover:text-primary-600 
@@ -114,7 +114,7 @@ const Navbar = () => {
           </div>
 
           {/* Auth Section */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             {isAuthenticated ? (
               <div className="relative">
                 <button

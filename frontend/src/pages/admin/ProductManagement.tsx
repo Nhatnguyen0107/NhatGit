@@ -289,62 +289,62 @@ const ProductManagement = () => {
             <div className="bg-white rounded-lg shadow-md 
                       overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y 
+                    <table className="w-full divide-y 
                           divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-6 py-3 text-left 
+                                <th className="px-3 py-3 text-left 
                                       text-xs font-medium 
                                       text-gray-500 uppercase 
-                                      tracking-wider">
+                                      tracking-wider w-16">
                                     STT
                                 </th>
-                                <th className="px-6 py-3 text-left 
+                                <th className="px-3 py-3 text-left 
                                       text-xs font-medium 
                                       text-gray-500 uppercase 
-                                      tracking-wider">
-                                    Hình ảnh
+                                      tracking-wider w-20">
+                                    Ảnh
                                 </th>
-                                <th className="px-6 py-3 text-left 
+                                <th className="px-3 py-3 text-left 
                                       text-xs font-medium 
                                       text-gray-500 uppercase 
-                                      tracking-wider">
+                                      tracking-wider min-w-[150px]">
                                     Tên sản phẩm
                                 </th>
-                                <th className="px-6 py-3 text-left 
+                                <th className="px-3 py-3 text-left 
                                       text-xs font-medium 
                                       text-gray-500 uppercase 
-                                      tracking-wider">
+                                      tracking-wider min-w-[200px]">
                                     Mô tả
                                 </th>
-                                <th className="px-6 py-3 text-left 
+                                <th className="px-3 py-3 text-left 
                                       text-xs font-medium 
                                       text-gray-500 uppercase 
-                                      tracking-wider">
+                                      tracking-wider w-32">
                                     Danh mục
                                 </th>
-                                <th className="px-6 py-3 text-left 
+                                <th className="px-3 py-3 text-left 
                                       text-xs font-medium 
                                       text-gray-500 uppercase 
-                                      tracking-wider">
+                                      tracking-wider w-28">
                                     Giá
                                 </th>
-                                <th className="px-6 py-3 text-left 
+                                <th className="px-3 py-3 text-left 
                                       text-xs font-medium 
                                       text-gray-500 uppercase 
-                                      tracking-wider">
+                                      tracking-wider w-20">
                                     Tồn kho
                                 </th>
-                                <th className="px-6 py-3 text-left 
+                                <th className="px-3 py-3 text-left 
                                       text-xs font-medium 
                                       text-gray-500 uppercase 
-                                      tracking-wider">
+                                      tracking-wider w-24">
                                     Trạng thái
                                 </th>
-                                <th className="px-6 py-3 text-left 
+                                <th className="px-3 py-3 text-left 
                                       text-xs font-medium 
                                       text-gray-500 uppercase 
-                                      tracking-wider">
+                                      tracking-wider w-32">
                                     Thao tác
                                 </th>
                             </tr>
@@ -365,65 +365,65 @@ const ProductManagement = () => {
                             ) : (
                                 filteredProducts.map((product, index) => (
                                     <tr key={product.id}>
-                                        <td className="px-6 py-4 
-                                              whitespace-nowrap 
+                                        <td className="px-3 py-3 
                                               text-sm 
                                               text-gray-900">
                                             {index + 1}
                                         </td>
-                                        <td className="px-6 py-4 
-                                              whitespace-nowrap">
+                                        <td className="px-3 py-3">
                                             <img
                                                 src={getImageUrl(
                                                     product.image_url
                                                 )}
                                                 alt={product.name}
-                                                className="w-16 h-16 
+                                                className="w-12 h-12 
                                                   object-cover 
-                                                  rounded-lg"
+                                                  rounded"
                                             />
                                         </td>
-                                        <td className="px-6 py-4 
-                                              whitespace-nowrap">
+                                        <td className="px-3 py-3">
                                             <div className="text-sm 
                                                   text-gray-900 
-                                                  font-medium">
+                                                  font-medium 
+                                                  line-clamp-2">
                                                 {product.name}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-3 py-3">
                                             <div className="text-sm 
                                                   text-gray-500 
-                                                  max-w-md">
+                                                  line-clamp-2">
                                                 {product.description || 'N/A'}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 
-                                              whitespace-nowrap 
+                                        <td className="px-3 py-3 
                                               text-sm 
                                               text-gray-900">
-                                            {product.category?.name ||
-                                                'N/A'}
+                                            <div className="truncate">
+                                                {product.category?.name ||
+                                                    'N/A'}
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4 
-                                              whitespace-nowrap 
+                                        <td className="px-3 py-3 
                                               text-sm 
                                               text-gray-900 
                                               font-semibold">
-                                            {formatPrice(product.price)}
+                                            <div className="truncate">
+                                                {formatPrice(product.price)}
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4 
-                                              whitespace-nowrap 
+                                        <td className="px-3 py-3 
                                               text-sm 
+                                              text-center
                                               text-gray-900">
                                             {product.stock_quantity}
                                         </td>
-                                        <td className="px-6 py-4 
-                                              whitespace-nowrap">
+                                        <td className="px-3 py-3">
                                             <span
                                                 className={`px-2 py-1 
                                                   text-xs rounded-full 
                                                   font-medium 
+                                                  whitespace-nowrap
                                                   ${getStatusBadgeColor(
                                                     product
                                                 )}`}
@@ -431,33 +431,33 @@ const ProductManagement = () => {
                                                 {getStatusLabel(product)}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 
-                                              whitespace-nowrap 
+                                        <td className="px-3 py-3 
                                               text-sm 
                                               font-medium">
-                                            <button
-                                                onClick={() =>
-                                                    handleOpenModal(
-                                                        product
-                                                    )
-                                                }
-                                                className="text-blue-600 
-                                                  hover:text-blue-900 
-                                                  mr-3"
-                                            >
-                                                Sửa
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        product.id
-                                                    )
-                                                }
-                                                className="text-red-600 
-                                                  hover:text-red-900"
-                                            >
-                                                Xóa
-                                            </button>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() =>
+                                                        handleOpenModal(
+                                                            product
+                                                        )
+                                                    }
+                                                    className="text-blue-600 
+                                                      hover:text-blue-900"
+                                                >
+                                                    Sửa
+                                                </button>
+                                                <button
+                                                    onClick={() =>
+                                                        handleDelete(
+                                                            product.id
+                                                        )
+                                                    }
+                                                    className="text-red-600 
+                                                      hover:text-red-900"
+                                                >
+                                                    Xóa
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -470,10 +470,10 @@ const ProductManagement = () => {
             {/* Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 
-                          flex items-center justify-center 
-                          z-50 p-4 overflow-y-auto">
+                              flex items-center justify-center 
+                              z-50 p-4 overflow-y-auto">
                     <div className="bg-white rounded-lg max-w-2xl 
-                          w-full p-6 my-8">
+                              w-full p-6 my-8">
                         <h2 className="text-xl font-semibold mb-4">
                             {selectedProduct
                                 ? 'Chỉnh sửa sản phẩm'

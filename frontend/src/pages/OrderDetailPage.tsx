@@ -170,8 +170,8 @@ const OrderDetailPage: React.FC = () => {
     }
 
     return (
-        <div className="bg-gray-50 min-h-screen py-8">
-            <div className="container mx-auto px-4 max-w-4xl">
+        <div className="min-h-screen bg-gray-50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Success Message */}
                 <div className="bg-green-50 border-2 border-green-200 
           rounded-lg p-6 mb-6 text-center">

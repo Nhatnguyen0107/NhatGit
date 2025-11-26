@@ -24,31 +24,14 @@ export const AvatarProvider: React.FC<{ children: React.ReactNode }> = ({
             try {
                 // Try to get user profile from auth endpoint (works for all roles)
                 const response = await api.get('/auth/profile');
-                const profileData = response.data?.data || response.data;
-
-                // Handle nested structure: { user: { username, avatar, customer: { ... } } }
-                const user = profileData.user || profileData;
-
-                console.log('🔄 AvatarContext - Fetching profile...');
-                console.log('📦 Response data:', profileData);
-                console.log('👤 User data:', user);
-                console.log('🖼️ Avatar:', user?.avatar);
-                console.log('✍️ Username:', user?.username);
-
-                setAvatar(user?.avatar || null);
-                setUsername(user?.username || null);
-
-                // Also update localStorage to keep in sync
-                if (user) {
-                    localStorage.setItem('user', JSON.stringify(user));
-                    if (user.username) {
-                        localStorage.setItem('username', user.username);
-                    }
-                }
+                const profileData = response.data?.data?.user || response.data?.user || response.data;
+                console.log('🔄 Avatar context fetched profile:', profileData);
+                setAvatar(profileData.avatar || null);
+                setUsername(profileData.username || null);
             } catch (error: any) {
                 // Silently handle errors (user might not have profile yet)
                 if (error.response?.status !== 404) {
-                    console.error('❌ Error fetching profile:', error);
+                    console.error('Error fetching profile:', error);
                 }
                 // Try to get username from localStorage as fallback
                 const user = JSON.parse(localStorage.getItem('user') || '{}');

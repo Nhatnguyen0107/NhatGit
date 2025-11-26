@@ -44,8 +44,8 @@ const BannerSlider = ({
     };
 
     return (
-        <div className="relative w-full h-[300px] sm:h-[400px] 
-                    md:h-[500px] lg:h-[600px] 
+        <div className="relative w-full h-[280px] sm:h-[360px] 
+                    md:h-[450px] lg:h-[520px] 
                     overflow-hidden rounded-lg shadow-lg group">
             {/* Images */}
             <div className="relative h-full">
@@ -61,11 +61,8 @@ const BannerSlider = ({
                         <img
                             src={image}
                             alt={`Banner ${index + 1}`}
-                            className="w-full h-full object-contain bg-gray-100"
+                            className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 
-                            bg-gradient-to-t 
-                            from-black/40 to-transparent" />
                     </div>
                 ))}
             </div>
@@ -135,26 +132,6 @@ const BannerSlider = ({
                             }`}
                     />
                 ))}
-            </div>
-
-            {/* Overlay Text */}
-            <div className="absolute bottom-12 sm:bottom-16 md:bottom-20 
-                      left-4 sm:left-8 text-white z-10 
-                      max-w-xl">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl 
-                       font-bold mb-2">
-                    Khuyến mãi đặc biệt
-                </h2>
-                <p className="text-sm sm:text-base md:text-lg mb-4">
-                    Giảm giá lên đến 50% cho sản phẩm chọn lọc
-                </p>
-                <button className="bg-blue-600 hover:bg-blue-700 
-                           text-white px-4 sm:px-6 
-                           py-2 sm:py-3 rounded-lg 
-                           font-semibold text-sm sm:text-base
-                           transition-colors">
-                    Mua ngay
-                </button>
             </div>
         </div>
     );
