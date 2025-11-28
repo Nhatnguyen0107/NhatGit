@@ -37,6 +37,17 @@ class OrderRepository {
         return await order.destroy();
     }
 
+    async updateStatus(id, status, payment_status = null) {
+        const updateData = { status };
+        if (payment_status) {
+            updateData.payment_status = payment_status;
+        }
+
+        return await this.model.update(updateData, {
+            where: { id }
+        });
+    }
+
     async count(where = {}) {
         return await this.model.count({ where });
     }

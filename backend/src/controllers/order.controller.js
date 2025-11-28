@@ -15,7 +15,7 @@ class OrderController {
             console.log('📦 Creating order for user:', userId);
             console.log('📦 Order data:', orderData);
 
-            const order = await this.checkoutService.checkout(
+            const order = await this.service.createOrderFromForm(
                 userId,
                 orderData
             );
@@ -30,8 +30,10 @@ class OrderController {
 
             const statusCode =
                 error.message === 'Shipping address is required' ||
+                    error.message === 'Phone number is required' ||
+                    error.message === 'Order items are required' ||
                     error.message.includes('Insufficient stock') ||
-                    error.message === 'Cart is empty'
+                    error.message.includes('Product not found')
                     ? 400
                     : error.message === 'Customer profile not found'
                         ? 404

@@ -19,6 +19,8 @@ import {
   ProfilePage,
 } from '@/pages';
 import SearchPage from '@/pages/SearchPage';
+import PaymentResultPage from '@/pages/PaymentResultPage';
+import VietQRPaymentPage from '@/pages/VietQRPaymentPage';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import UserManagement from '@/pages/admin/UserManagement';
 import ProductManagement from '@/pages/admin/ProductManagement';
@@ -26,6 +28,7 @@ import CategoryManagement from '@/pages/admin/CategoryManagement';
 import OrderManagement from '@/pages/admin/OrderManagement';
 import Statistics from '@/pages/admin/Statistics';
 import ReviewManagement from '@/pages/admin/ReviewManagement';
+import Settings from '@/pages/admin/Settings';
 
 const router = createBrowserRouter([
   {
@@ -71,6 +74,14 @@ const router = createBrowserRouter([
             <CheckoutPage />
           </PrivateRoute>
         ),
+      },
+      {
+        path: 'payment/result',
+        element: <PaymentResultPage />,
+      },
+      {
+        path: 'payment/vietqr',
+        element: <VietQRPaymentPage />,
       },
       {
         path: 'orders/:id',
@@ -133,6 +144,10 @@ const router = createBrowserRouter([
       {
         path: 'reviews',
         element: <ReviewManagement />,
+      },
+      {
+        path: 'settings',
+        element: <Settings />,
       },
     ],
   },

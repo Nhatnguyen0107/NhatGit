@@ -1,0 +1,34 @@
+{
+  "system": {
+    "siteName": "E-Commerce Store",
+    "siteDescription": "Cửa hàng điện tử uy tín",
+    "contactEmail": "nguyenquocnhat2005@gmail.com",
+    "contactPhone": "0363908146",
+    "address": "123 Nguyễn Văn A, Q1, TP.HCM",
+    "currency": "VND",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "maintenanceMode": true,
+    "allowRegistration": true,
+    "emailNotifications": true,
+    "smsNotifications": false
+  },
+  "email": {
+    "smtpHost": "smtp.gmail.com",
+    "smtpPort": 587,
+    "smtpUsername": "",
+    "smtpPassword": "",
+    "smtpSecure": true,
+    "fromEmail": "noreply@ecommerce.com",
+    "fromName": "E-Commerce Store"
+  },
+  "security": {
+    "sessionTimeout": 30,
+    "maxLoginAttempts": 5,
+    "lockoutDuration": 15,
+    "passwordMinLength": 8,
+    "requireSpecialChars": true,
+    "requireNumbers": true,
+    "requireUppercase": true,
+    "twoFactorAuth": false
+  }
+}

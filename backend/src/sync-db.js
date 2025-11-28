@@ -18,6 +18,8 @@ const syncDatabase = async () => {
         console.log('  - orders');
         console.log('  - order_items');
         console.log('  - cart_items');
+        console.log('  - reviews');
+        console.log('  - payments');
 
         process.exit(0);
     } catch (error) {

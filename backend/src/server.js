@@ -14,6 +14,8 @@ import orderRoutes from './routes/order.routes.js';
 import customerRoutes from './routes/customer.routes.js';
 import statisticsRoutes from './routes/statistics.routes.js';
 import reviewRoutes from './routes/review.routes.js';
+import settingsRoutes from './routes/settings.routes.js';
+import paymentRoutes from './routes/payment.routes.js';
 
 dotenv.config();
 
@@ -45,6 +47,8 @@ app.get('/', (req, res) => {
             customers: '/api/customers',
             statistics: '/api/statistics',
             reviews: '/api/reviews',
+            settings: '/api/settings',
+            payment: '/api/payment',
             test: '/api/test'
         }
     });
@@ -70,6 +74,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/statistics', statisticsRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/payment', paymentRoutes);
 app.use('/api/test', testRoutes);
 
 // 404 Handler

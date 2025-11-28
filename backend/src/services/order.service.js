@@ -1,8 +1,115 @@
 import OrderRepository from '../repositories/order.repository.js';
+import { v4 as uuidv4 } from 'uuid';
 
 class OrderService {
     constructor() {
         this.repository = new OrderRepository();
+    }
+
+    async createOrderFromForm(userId, orderData) {
+        const { shipping_address, phone, notes, items } = orderData;
+
+        // Validate required fields
+        if (!shipping_address || !shipping_address.trim()) {
+            throw new Error('Shipping address is required');
+        }
+
+        if (!phone || !phone.trim()) {
+            throw new Error('Phone number is required');
+        }
+
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            throw new Error('Order items are required');
+        }
+
+        // Find customer by user_id
+        const customer = await this.repository.model.sequelize
+            .models.Customer.findOne({ where: { user_id: userId } });
+
+        if (!customer) {
+            throw new Error('Customer profile not found');
+        }
+
+        // Calculate total amount and prepare order items
+        let subtotal = 0;
+        const validatedItems = [];
+
+        for (const item of items) {
+            const product = await this.repository.model.sequelize
+                .models.Product.findByPk(item.product_id);
+
+            if (!product) {
+                throw new Error(`Product not found: ${item.product_id}`);
+            }
+
+            if (product.stock_quantity < item.quantity) {
+                throw new Error(`Insufficient stock for ${product.name}`);
+            }
+
+            const discount = product.discount_percentage || 0;
+            const finalPrice = item.price * (1 - discount / 100);
+            const itemSubtotal = finalPrice * item.quantity;
+            subtotal += itemSubtotal;
+
+            validatedItems.push({
+                id: uuidv4(),
+                product_id: item.product_id,
+                product_name: product.name,
+                product_price: item.price,
+                quantity: item.quantity,
+                discount_percentage: discount,
+                subtotal: itemSubtotal
+            });
+        }
+
+        // Generate order number
+        const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+
+        console.log('🔢 Generated order number:', orderNumber);
+        console.log('💰 Calculated subtotal:', subtotal);
+
+        // Create order
+        const orderCreateData = {
+            id: uuidv4(),
+            order_number: orderNumber,
+            customer_id: customer.id,
+            subtotal: subtotal,
+            total_amount: subtotal, // For now, no shipping or additional costs
+            shipping_address: shipping_address.trim(),
+            shipping_phone: phone.trim(),
+            notes: notes ? notes.trim() : null,
+            status: 'pending',
+            payment_status: 'pending',
+            payment_method: 'pending'
+        };
+
+        console.log('📝 Order data to create:', orderCreateData);
+
+        const order = await this.repository.create(orderCreateData);
+
+        // Create order items
+        await this.repository.model.sequelize.models.OrderItem.bulkCreate(
+            validatedItems.map(item => ({
+                ...item,
+                order_id: order.id
+            }))
+        );
+
+        // Update product stock
+        for (const item of validatedItems) {
+            await this.repository.model.sequelize.models.Product.decrement(
+                'stock_quantity',
+                {
+                    by: item.quantity,
+                    where: { id: item.product_id }
+                }
+            );
+        }
+
+        // Return order with items
+        return await this.repository.findById(order.id, {
+            include: this.repository.buildInclude()
+        });
     }
 
     async getMyOrders(userId, queryParams) {

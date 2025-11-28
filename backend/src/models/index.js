@@ -8,6 +8,10 @@ import Order from './Order.js';
 import OrderItem from './OrderItem.js';
 import CartItem from './CartItem.js';
 import Review from './Review.js';
+import PaymentModel from './Payment.js';
+
+// Initialize Payment model
+const Payment = PaymentModel(sequelize);
 
 // ============= Associations / Relationships =============
 
@@ -111,6 +115,16 @@ Review.belongsTo(Customer, {
     as: 'customer'
 });
 
+// Order - Payment: One to Many
+Order.hasMany(Payment, {
+    foreignKey: 'order_id',
+    as: 'payments'
+});
+Payment.belongsTo(Order, {
+    foreignKey: 'order_id',
+    as: 'order'
+});
+
 // ============= Export Models =============
 
 const db = {
@@ -123,7 +137,8 @@ const db = {
     Order,
     OrderItem,
     CartItem,
-    Review
+    Review,
+    Payment
 };
 
 export default db;
