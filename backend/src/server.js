@@ -48,7 +48,7 @@ app.get('/', (req, res) => {
             statistics: '/api/statistics',
             reviews: '/api/reviews',
             settings: '/api/settings',
-            payment: '/api/payment',
+            payments: '/api/payments',
             test: '/api/test'
         }
     });
@@ -75,7 +75,7 @@ app.use('/api/customers', customerRoutes);
 app.use('/api/statistics', statisticsRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/settings', settingsRoutes);
-app.use('/api/payment', paymentRoutes);
+app.use('/api/payments', paymentRoutes);
 app.use('/api/test', testRoutes);
 
 // 404 Handler

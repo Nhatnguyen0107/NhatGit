@@ -21,7 +21,7 @@ interface CheckoutFormData {
     shipping_address: string;
     phone: string;
     notes?: string;
-    payment_method: 'cod' | 'vnpay' | 'paypal' | 'vietqr';
+    payment_method: 'cod' | 'payos' | 'vnpay';
 }
 
 const CheckoutPage: React.FC = () => {
@@ -126,6 +126,9 @@ const CheckoutPage: React.FC = () => {
             const response = await api.post('/orders', orderData);
             const orderId = response.data?.data?.order?.id ||
                 response.data?.data?.id;
+            const orderAmount = response.data?.data?.order?.total_amount ||
+                response.data?.data?.total_amount ||
+                0;
 
             console.log('Order created:', response.data);
 
@@ -135,70 +138,47 @@ const CheckoutPage: React.FC = () => {
                 await api.delete('/cart');
                 alert('Đặt hàng thành công! Bạn sẽ thanh toán khi nhận hàng.');
                 navigate(`/orders/${orderId}`);
+            } else if (formData.payment_method === 'payos') {
+                // PayOS - tạo payment và chuyển hướng
+                try {
+                    const paymentData = await paymentService.createPayOSPayment({
+                        orderId: orderId,
+                        amount: orderAmount,
+                        description: `Thanh toan don hang ${orderId}`
+                    });
+
+                    if (paymentData.checkoutUrl) {
+                        // Xóa giỏ hàng trước khi chuyển
+                        await api.delete('/cart');
+                        // Chuyển hướng đến PayOS
+                        window.location.href = paymentData.checkoutUrl;
+                    } else {
+                        throw new Error('Không nhận được URL thanh toán từ PayOS');
+                    }
+                } catch (paymentError: any) {
+                    console.error('PayOS payment error:', paymentError);
+                    alert('Không thể tạo thanh toán PayOS. Vui lòng thử lại.');
+                }
             } else if (formData.payment_method === 'vnpay') {
                 // VNPay - tạo payment và chuyển hướng
                 try {
                     const paymentData = await paymentService.createVNPayPayment({
-                        order_id: orderId,
-                        amount: calculateTotal(),
-                        return_url: `${window.location.origin}/payment/result`,
-                        ip_address: '127.0.0.1' // Có thể cải thiện để lấy IP thật
+                        orderId: orderId,
+                        amount: orderAmount,
+                        description: `Thanh toan don hang ${orderId}`
                     });
 
-                    if (paymentData.payment_url) {
-                        // Lưu thông tin để xử lý khi trở về
-                        localStorage.setItem('pending_order_id', orderId.toString());
-                        localStorage.setItem('payment_method', 'vnpay');
-
-                        // Chuyển hướng tới VNPay
-                        window.location.href = paymentData.payment_url;
+                    if (paymentData.checkoutUrl) {
+                        // Xóa giỏ hàng trước khi chuyển
+                        await api.delete('/cart');
+                        // Chuyển hướng đến VNPay
+                        window.location.href = paymentData.checkoutUrl;
                     } else {
                         throw new Error('Không nhận được URL thanh toán từ VNPay');
                     }
-                } catch (paymentError) {
+                } catch (paymentError: any) {
                     console.error('VNPay payment error:', paymentError);
                     alert('Không thể tạo thanh toán VNPay. Vui lòng thử lại.');
-                }
-            } else if (formData.payment_method === 'paypal') {
-                // PayPal - tạo payment và chuyển hướng
-                try {
-                    const usdAmount = (calculateTotal() / 24000).toFixed(2); // Ước tính tỷ giá
-
-                    const paymentData = await paymentService.createPayPalPayment({
-                        order_id: orderId,
-                        amount: parseFloat(usdAmount),
-                        currency: 'USD',
-                        return_url: `${window.location.origin}/payment/result`,
-                        cancel_url: `${window.location.origin}/checkout`
-                    });
-
-                    if (paymentData.payment_url) {
-                        // Lưu thông tin để xử lý khi trở về
-                        localStorage.setItem('pending_order_id', orderId.toString());
-                        localStorage.setItem('payment_method', 'paypal');
-                        localStorage.setItem('paypal_payment_id', paymentData.payment_id);
-
-                        // Chuyển hướng tới PayPal
-                        window.location.href = paymentData.payment_url;
-                    } else {
-                        throw new Error('Không nhận được URL thanh toán từ PayPal');
-                    }
-                } catch (paymentError) {
-                    console.error('PayPal payment error:', paymentError);
-                    alert('Không thể tạo thanh toán PayPal. Vui lòng thử lại.');
-                }
-            } else if (formData.payment_method === 'vietqr') {
-                // VietQR - chuyển đến trang thanh toán QR
-                try {
-                    localStorage.setItem('pending_order_id', orderId.toString());
-                    localStorage.setItem('payment_method', 'vietqr');
-                    localStorage.setItem('payment_amount', calculateTotal().toString());
-
-                    // Chuyển đến trang thanh toán VietQR
-                    navigate(`/payment/vietqr?orderId=${orderId}&amount=${calculateTotal()}`);
-                } catch (paymentError) {
-                    console.error('VietQR payment error:', paymentError);
-                    alert('Không thể tạo thanh toán QR Code. Vui lòng thử lại.');
                 }
             }
 
@@ -341,6 +321,34 @@ const CheckoutPage: React.FC = () => {
                                     </label>
 
                                     <label className={`flex items-center p-4 border-2 
+                                        rounded-lg cursor-pointer transition-colors ${formData.payment_method === 'payos'
+                                            ? 'border-purple-500 bg-purple-50'
+                                            : 'border-gray-200 hover:border-gray-300'
+                                        }`}>
+                                        <input
+                                            type="radio"
+                                            name="payment_method"
+                                            value="payos"
+                                            checked={formData.payment_method === 'payos'}
+                                            onChange={handleInputChange}
+                                            className="w-4 h-4 text-purple-600"
+                                        />
+                                        <div className="ml-3">
+                                            <div className="font-semibold text-gray-900">
+                                                🏦 Thanh toán PayOS
+                                            </div>
+                                            <div className="text-sm text-gray-600">
+                                                Thanh toán online qua Ngân hàng
+                                                {formData.payment_method === 'payos' && (
+                                                    <div className="text-xs text-purple-600 mt-1">
+                                                        Nhanh chóng, an toàn và tiện lợi
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <label className={`flex items-center p-4 border-2 
                                         rounded-lg cursor-pointer transition-colors ${formData.payment_method === 'vnpay'
                                             ? 'border-red-500 bg-red-50'
                                             : 'border-gray-200 hover:border-gray-300'
@@ -355,64 +363,13 @@ const CheckoutPage: React.FC = () => {
                                         />
                                         <div className="ml-3">
                                             <div className="font-semibold text-gray-900">
-                                                🏦 Thanh toán VNPay
+                                                💳 Thanh toán VNPay
                                             </div>
                                             <div className="text-sm text-gray-600">
-                                                Thanh toán qua Internet Banking, Ví điện tử, QR Code
-                                            </div>
-                                        </div>
-                                    </label>
-
-                                    <label className={`flex items-center p-4 border-2 
-                                        rounded-lg cursor-pointer transition-colors ${formData.payment_method === 'paypal'
-                                            ? 'border-blue-600 bg-blue-50'
-                                            : 'border-gray-200 hover:border-gray-300'
-                                        }`}>
-                                        <input
-                                            type="radio"
-                                            name="payment_method"
-                                            value="paypal"
-                                            checked={formData.payment_method === 'paypal'}
-                                            onChange={handleInputChange}
-                                            className="w-4 h-4 text-blue-600"
-                                        />
-                                        <div className="ml-3">
-                                            <div className="font-semibold text-gray-900">
-                                                💳 Thanh toán PayPal
-                                            </div>
-                                            <div className="text-sm text-gray-600">
-                                                Thanh toán quốc tế qua Visa/Mastercard
-                                                {formData.payment_method === 'paypal' && (
-                                                    <div className="text-xs text-orange-600 mt-1">
-                                                        Số tiền sẽ được chuyển đổi sang USD
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </label>
-
-                                    <label className={`flex items-center p-4 border-2 
-                                        rounded-lg cursor-pointer transition-colors ${formData.payment_method === 'vietqr'
-                                            ? 'border-green-500 bg-green-50'
-                                            : 'border-gray-200 hover:border-gray-300'
-                                        }`}>
-                                        <input
-                                            type="radio"
-                                            name="payment_method"
-                                            value="vietqr"
-                                            checked={formData.payment_method === 'vietqr'}
-                                            onChange={handleInputChange}
-                                            className="w-4 h-4 text-green-600"
-                                        />
-                                        <div className="ml-3">
-                                            <div className="font-semibold text-gray-900">
-                                                📱 Thanh toán QR Code
-                                            </div>
-                                            <div className="text-sm text-gray-600">
-                                                Quét mã QR bằng app ngân hàng để thanh toán
-                                                {formData.payment_method === 'vietqr' && (
-                                                    <div className="text-xs text-green-600 mt-1">
-                                                        Nhanh chóng, an toàn và tiện lợi
+                                                Thanh toán qua ví điện tử VNPay
+                                                {formData.payment_method === 'vnpay' && (
+                                                    <div className="text-xs text-red-600 mt-1">
+                                                        Hỗ trợ thẻ ATM, QR Code
                                                     </div>
                                                 )}
                                             </div>

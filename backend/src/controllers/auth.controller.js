@@ -384,7 +384,51 @@ export const changePassword = async (req, res) => {
 // Admin user management functions
 export const getAllUsers = async (req, res) => {
     try {
-        const users = await User.findAll({
+        const {
+            page = 1,
+            limit = 10,
+            search = '',
+            role_id,
+            is_active,
+            sort = 'newest'
+        } = req.query;
+
+        const offset = (parseInt(page) - 1) * parseInt(limit);
+
+        // Build where condition
+        const where = {};
+
+        if (search) {
+            const { Op } = await import('sequelize');
+            where[Op.or] = [
+                { username: { [Op.like]: `%${search}%` } },
+                { email: { [Op.like]: `%${search}%` } }
+            ];
+        }
+
+        if (role_id) {
+            where.role_id = role_id;
+        }
+
+        if (is_active !== undefined) {
+            where.is_active = is_active === 'true';
+        }
+
+        // Build order
+        let order;
+        switch (sort) {
+            case 'oldest':
+                order = [['created_at', 'ASC']];
+                break;
+            case 'name':
+                order = [['username', 'ASC']];
+                break;
+            default:
+                order = [['created_at', 'DESC']];
+        }
+
+        const { rows: users, count } = await User.findAndCountAll({
+            where,
             include: [
                 {
                     model: Role,
@@ -398,12 +442,23 @@ export const getAllUsers = async (req, res) => {
                 }
             ],
             attributes: { exclude: ['password'] },
-            order: [['created_at', 'DESC']]
+            order,
+            offset: parseInt(offset),
+            limit: parseInt(limit),
+            distinct: true
         });
 
         res.json({
             success: true,
-            data: users
+            data: {
+                users,
+                pagination: {
+                    total: count,
+                    page: parseInt(page),
+                    limit: parseInt(limit),
+                    totalPages: Math.ceil(count / parseInt(limit))
+                }
+            }
         });
     } catch (error) {
         console.error('Get all users error:', error);

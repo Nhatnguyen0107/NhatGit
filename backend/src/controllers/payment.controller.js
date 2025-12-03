@@ -199,6 +199,199 @@ class PaymentController {
             });
         }
     }
+
+    // PayOS create payment
+    async createPayOSPayment(req, res) {
+        try {
+            console.log('📥 PayOS create payment request:', req.body);
+
+            const { orderId, amount, description } = req.body;
+
+            if (!orderId || !amount) {
+                console.log('❌ Missing required fields:', { orderId, amount });
+                return res.status(400).json({
+                    success: false,
+                    message: 'orderId and amount are required'
+                });
+            }
+
+            console.log('✅ Creating PayOS payment for order:', orderId);
+
+            const payment = await this.paymentService.createPayOSPayment(
+                orderId,
+                amount,
+                description
+            );
+
+            console.log('✅ PayOS payment created:', payment);
+
+            res.json({
+                success: true,
+                data: payment
+            });
+        } catch (error) {
+            console.error('❌ Create PayOS payment error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to create PayOS payment',
+                error: error.message
+            });
+        }
+    }
+
+    // PayOS confirm payment (mock)
+    async confirmPayOSPayment(req, res) {
+        try {
+            const { orderId, orderCode } = req.body;
+
+            if (!orderId || !orderCode) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'orderId and orderCode are required'
+                });
+            }
+
+            const result = await this.paymentService.confirmPayOSPayment(
+                orderId,
+                orderCode
+            );
+
+            res.json({
+                success: true,
+                data: result
+            });
+        } catch (error) {
+            console.error('❌ Confirm PayOS payment error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to confirm payment',
+                error: error.message
+            });
+        }
+    }
+
+    // VNPay create payment (mock)
+    async createVNPayPayment(req, res) {
+        try {
+            console.log('📥 VNPay create payment request:', req.body);
+
+            const { orderId, amount, description } = req.body;
+
+            if (!orderId || !amount) {
+                console.log('❌ Missing required fields:', { orderId, amount });
+                return res.status(400).json({
+                    success: false,
+                    message: 'orderId and amount are required'
+                });
+            }
+
+            console.log('✅ Creating VNPay payment for order:', orderId);
+
+            const payment = await this.paymentService.createVNPayPayment(
+                orderId,
+                amount,
+                description
+            );
+
+            console.log('✅ VNPay payment created:', payment);
+
+            res.json({
+                success: true,
+                data: payment
+            });
+        } catch (error) {
+            console.error('❌ Create VNPay payment error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to create VNPay payment',
+                error: error.message
+            });
+        }
+    }
+
+    // VNPay confirm payment (mock)
+    async confirmVNPayPayment(req, res) {
+        try {
+            const { orderId, orderCode } = req.body;
+
+            if (!orderId || !orderCode) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'orderId and orderCode are required'
+                });
+            }
+
+            const result = await this.paymentService.confirmVNPayPayment(
+                orderId,
+                orderCode
+            );
+
+            res.json({
+                success: true,
+                data: result
+            });
+        } catch (error) {
+            console.error('❌ Confirm VNPay payment error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to confirm payment',
+                error: error.message
+            });
+        }
+    }
+
+    // PayOS webhook handler
+    async handlePayOSWebhook(req, res) {
+        try {
+            const webhookData = req.body;
+
+            console.log('📩 PayOS webhook received:', webhookData);
+
+            const result = await this.paymentService.handlePayOSWebhook(webhookData);
+
+            res.json({
+                success: true,
+                data: result
+            });
+        } catch (error) {
+            console.error('❌ PayOS webhook error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Webhook processing failed',
+                error: error.message
+            });
+        }
+    }
+
+    // PayOS get payment info
+    async getPayOSPaymentInfo(req, res) {
+        try {
+            const { orderCode } = req.params;
+
+            if (!orderCode) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'orderCode is required'
+                });
+            }
+
+            const paymentInfo = await this.paymentService.getPayOSPaymentInfo(
+                parseInt(orderCode)
+            );
+
+            res.json({
+                success: true,
+                data: paymentInfo
+            });
+        } catch (error) {
+            console.error('❌ Get PayOS payment info error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Failed to get payment info',
+                error: error.message
+            });
+        }
+    }
 }
 
 export default PaymentController;

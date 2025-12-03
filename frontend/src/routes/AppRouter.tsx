@@ -21,6 +21,8 @@ import {
 import SearchPage from '@/pages/SearchPage';
 import PaymentResultPage from '@/pages/PaymentResultPage';
 import VietQRPaymentPage from '@/pages/VietQRPaymentPage';
+import PayOSMockPayment from '@/pages/PayOSMockPayment';
+import VNPayMockPayment from '@/pages/VNPayMockPayment';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import UserManagement from '@/pages/admin/UserManagement';
 import ProductManagement from '@/pages/admin/ProductManagement';
@@ -82,6 +84,14 @@ const router = createBrowserRouter([
       {
         path: 'payment/vietqr',
         element: <VietQRPaymentPage />,
+      },
+      {
+        path: 'payment/payos-mock',
+        element: <PayOSMockPayment />,
+      },
+      {
+        path: 'payment/vnpay-mock',
+        element: <VNPayMockPayment />,
       },
       {
         path: 'orders/:id',

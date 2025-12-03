@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '@/services/api';
-import Pagination from '@/components/Pagination';
-import { usePagination } from '@/hooks/usePagination';
+import Pagination from '@/components/admin/Pagination';
 
 interface Order {
     id: string;
@@ -41,17 +40,51 @@ const OrderManagement = () => {
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [selectedOrder, setSelectedOrder] =
         useState<Order | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [total, setTotal] = useState(0);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     useEffect(() => {
         fetchOrders();
-    }, []);
+    }, [currentPage, searchTerm, statusFilter, itemsPerPage]);
 
     const fetchOrders = async () => {
         try {
             setLoading(true);
-            const response = await api.get('/orders');
-            const data = response.data?.data || [];
-            setOrders(Array.isArray(data) ? data : []);
+            const params = new URLSearchParams({
+                page: currentPage.toString(),
+                limit: itemsPerPage.toString(),
+            });
+
+            if (searchTerm) {
+                params.append('search', searchTerm);
+            }
+
+            if (statusFilter) {
+                params.append('status', statusFilter);
+            }
+
+            const response = await api.get(`/orders?${params.toString()}`);
+
+            console.log('📦 Orders API response:', response.data);
+
+            // Backend trả về: { success: true, data: [...orders], pagination: {...} }
+            const ordersArray = Array.isArray(response.data?.data)
+                ? response.data.data
+                : [];
+            const paginationData = response.data?.pagination || {};
+
+            console.log('📦 Orders array:', ordersArray);
+            console.log('📦 Pagination:', paginationData);
+
+            setOrders(ordersArray);
+
+            if (paginationData) {
+                setCurrentPage(paginationData.page || 1);
+                setTotalPages(paginationData.totalPages || 1);
+                setTotal(paginationData.total || 0);
+            }
         } catch (err: any) {
             setError('Không thể tải danh sách đơn hàng');
             console.error('Fetch orders error:', err);
@@ -112,39 +145,10 @@ const OrderManagement = () => {
         return labels[method] || method;
     };
 
-    const filteredOrders = orders.filter((order) => {
-        const customerName = order.customer
-            ? `${order.customer.first_name} ${order.customer.last_name}`
-            : '';
-        const customerEmail = order.customer?.user?.email || '';
-
-        const matchesSearch =
-            order.id?.toLowerCase().includes(
-                searchTerm.toLowerCase()
-            ) ||
-            customerName.toLowerCase().includes(
-                searchTerm.toLowerCase()
-            ) ||
-            customerEmail.toLowerCase().includes(
-                searchTerm.toLowerCase()
-            );
-
-        const matchesStatus = statusFilter
-            ? order.status === statusFilter
-            : true;
-
-        return matchesSearch && matchesStatus;
-    });
-
-    // Pagination
-    const {
-        currentPage,
-        totalPages,
-        startIndex,
-        endIndex,
-        currentItems: currentOrders,
-        handlePageChange
-    } = usePagination({ items: filteredOrders, itemsPerPage: 10 });
+    const handleItemsPerPageChange = (newItemsPerPage: number) => {
+        setItemsPerPage(newItemsPerPage);
+        setCurrentPage(1);
+    };
 
     const handleViewDetail = async (order: Order) => {
         try {
@@ -250,9 +254,10 @@ const OrderManagement = () => {
                             placeholder="Mã đơn, tên, email khách 
                                   hàng..."
                             value={searchTerm}
-                            onChange={(e) =>
-                                setSearchTerm(e.target.value)
-                            }
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setCurrentPage(1);
+                            }}
                             className="w-full px-4 py-2 border 
                                   border-gray-300 rounded-lg 
                                   focus:ring-2 focus:ring-blue-500 
@@ -266,9 +271,10 @@ const OrderManagement = () => {
                         </label>
                         <select
                             value={statusFilter}
-                            onChange={(e) =>
-                                setStatusFilter(e.target.value)
-                            }
+                            onChange={(e) => {
+                                setStatusFilter(e.target.value);
+                                setCurrentPage(1);
+                            }}
                             className="w-full px-4 py-2 border 
                                   border-gray-300 rounded-lg 
                                   focus:ring-2 focus:ring-blue-500 
@@ -344,7 +350,7 @@ const OrderManagement = () => {
                         </thead>
                         <tbody className="bg-white divide-y 
                               divide-gray-200">
-                            {currentOrders.length === 0 ? (
+                            {orders.length === 0 ? (
                                 <tr>
                                     <td
                                         colSpan={9}
@@ -356,13 +362,13 @@ const OrderManagement = () => {
                                     </td>
                                 </tr>
                             ) : (
-                                currentOrders.map((order, index) => (
+                                orders.map((order, index) => (
                                     <tr key={order.id}>
                                         <td className="px-3 py-3 
                                               whitespace-nowrap 
                                               text-sm 
                                               text-gray-900">
-                                            {startIndex + index + 1}
+                                            {(currentPage - 1) * itemsPerPage + index + 1}
                                         </td>
                                         <td className="px-3 py-3 
                                               whitespace-nowrap 
@@ -581,10 +587,10 @@ const OrderManagement = () => {
                 <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                    totalItems={filteredOrders.length}
-                    startIndex={startIndex}
-                    endIndex={endIndex}
+                    total={total}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={setCurrentPage}
+                    onItemsPerPageChange={handleItemsPerPageChange}
                     itemName="đơn hàng"
                 />
             </div>

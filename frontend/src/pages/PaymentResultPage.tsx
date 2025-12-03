@@ -24,10 +24,35 @@ const PaymentResultPage: React.FC = () => {
 
     const handlePaymentResult = async () => {
         try {
-            const orderId = localStorage.getItem('pending_order_id');
+            // For mock payments (PayOS, VNPay), check URL params
+            const status = searchParams.get('status');
+            const orderId = searchParams.get('orderId');
+            const orderNumber = searchParams.get('orderNumber');
+
+            if (status && orderId) {
+                // Mock payment result from URL
+                if (status === 'success') {
+                    setResult({
+                        success: true,
+                        message: 'Thanh toán thành công!',
+                        order_id: orderId,
+                        transaction_id: orderNumber || orderId
+                    });
+                } else {
+                    setResult({
+                        success: false,
+                        message: 'Thanh toán thất bại hoặc đã bị hủy'
+                    });
+                }
+                setLoading(false);
+                return;
+            }
+
+            // Fallback: Check localStorage for pending payment
+            const pendingOrderId = localStorage.getItem('pending_order_id');
             const paymentMethod = localStorage.getItem('payment_method');
 
-            if (!orderId || !paymentMethod) {
+            if (!pendingOrderId || !paymentMethod) {
                 setError('Không tìm thấy thông tin đơn hàng');
                 setLoading(false);
                 return;
@@ -35,16 +60,10 @@ const PaymentResultPage: React.FC = () => {
 
             let paymentResult: PaymentResult;
 
-            if (paymentMethod === 'vnpay') {
-                // Xử lý VNPay return
-                const params = Object.fromEntries(searchParams.entries());
-
-                paymentResult = await paymentService.handleVNPayReturn(params);
-            } else if (paymentMethod === 'paypal') {
+            if (paymentMethod === 'paypal') {
                 // Xử lý PayPal return  
                 const paymentId = searchParams.get('paymentId');
                 const payerId = searchParams.get('PayerID');
-                const token = searchParams.get('token');
 
                 if (!paymentId || !payerId) {
                     throw new Error('Thiếu thông tin thanh toán PayPal');
@@ -53,7 +72,7 @@ const PaymentResultPage: React.FC = () => {
                 paymentResult = await paymentService.executePayPalPayment({
                     payment_id: paymentId,
                     payer_id: payerId,
-                    order_id: parseInt(orderId)
+                    order_id: parseInt(pendingOrderId)
                 });
             } else {
                 throw new Error('Phương thức thanh toán không hợp lệ');

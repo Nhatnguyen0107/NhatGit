@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '@/services/api';
 import { getImageUrl } from '@/utils/imageUrl';
+import Pagination from '@/components/admin/Pagination';
 
 interface Product {
     id: string;
@@ -29,6 +30,10 @@ const ProductManagement = () => {
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [total, setTotal] = useState(0);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [showModal, setShowModal] = useState(false);
     const [selectedProduct, setSelectedProduct] =
         useState<Product | null>(null);
@@ -44,24 +49,31 @@ const ProductManagement = () => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [currentPage, searchTerm, categoryFilter, itemsPerPage]);
 
     const fetchData = async () => {
         try {
             setLoading(true);
+            const productParams = new URLSearchParams({
+                page: currentPage.toString(),
+                limit: itemsPerPage.toString(),
+                search: searchTerm,
+                ...(categoryFilter && { category_id: categoryFilter })
+            });
+
             const [productsRes, categoriesRes] = await Promise.all([
-                api.get('/products'),
-                api.get('/categories'),
+                api.get(`/products?${productParams}`),
+                api.get('/categories?limit=1000'),
             ]);
 
-            // Backend trả về: { data: { products: [], pagination: {} } }
-            const productsData = productsRes.data?.data?.products || [];
-            // Backend trả về: { data: { categories: [], pagination: {} } }
+            const productsData = productsRes.data?.data || {};
             const categoriesData = categoriesRes.data?.data?.categories || [];
 
-            setProducts(
-                Array.isArray(productsData) ? productsData : []
-            );
+            setProducts(productsData.products || []);
+            if (productsData.pagination) {
+                setTotalPages(productsData.pagination.totalPages);
+                setTotal(productsData.pagination.total);
+            }
             setCategories(
                 Array.isArray(categoriesData) ? categoriesData : []
             );
@@ -92,15 +104,10 @@ const ProductManagement = () => {
         return product.stock_quantity > 0 ? 'Còn hàng' : 'Hết hàng';
     };
 
-    const filteredProducts = products.filter((product) => {
-        const matchesSearch = product.name
-            ?.toLowerCase()
-            .includes(searchTerm.toLowerCase());
-        const matchesCategory = categoryFilter
-            ? product.category_id === categoryFilter
-            : true;
-        return matchesSearch && matchesCategory;
-    });
+    const handleItemsPerPageChange = (newItemsPerPage: number) => {
+        setItemsPerPage(newItemsPerPage);
+        setCurrentPage(1);
+    };
 
     const handleOpenModal = (product?: Product) => {
         if (product) {
@@ -250,9 +257,10 @@ const ProductManagement = () => {
                             type="text"
                             placeholder="Tên sản phẩm..."
                             value={searchTerm}
-                            onChange={(e) =>
-                                setSearchTerm(e.target.value)
-                            }
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setCurrentPage(1);
+                            }}
                             className="w-full px-4 py-2 border 
                                   border-gray-300 rounded-lg 
                                   focus:ring-2 focus:ring-blue-500 
@@ -266,9 +274,10 @@ const ProductManagement = () => {
                         </label>
                         <select
                             value={categoryFilter}
-                            onChange={(e) =>
-                                setCategoryFilter(e.target.value)
-                            }
+                            onChange={(e) => {
+                                setCategoryFilter(e.target.value);
+                                setCurrentPage(1);
+                            }}
                             className="w-full px-4 py-2 border 
                                   border-gray-300 rounded-lg 
                                   focus:ring-2 focus:ring-blue-500 
@@ -351,7 +360,7 @@ const ProductManagement = () => {
                         </thead>
                         <tbody className="bg-white divide-y 
                               divide-gray-200">
-                            {filteredProducts.length === 0 ? (
+                            {products.length === 0 ? (
                                 <tr>
                                     <td
                                         colSpan={9}
@@ -363,12 +372,12 @@ const ProductManagement = () => {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredProducts.map((product, index) => (
+                                products.map((product, index) => (
                                     <tr key={product.id}>
                                         <td className="px-3 py-3 
                                               text-sm 
                                               text-gray-900">
-                                            {index + 1}
+                                            {(currentPage - 1) * itemsPerPage + index + 1}
                                         </td>
                                         <td className="px-3 py-3">
                                             <img
@@ -465,6 +474,17 @@ const ProductManagement = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination */}
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    total={total}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={setCurrentPage}
+                    onItemsPerPageChange={handleItemsPerPageChange}
+                    itemName="sản phẩm"
+                />
             </div>
 
             {/* Modal */}

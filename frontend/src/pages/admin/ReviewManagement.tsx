@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '@/services/api';
 import { getImageUrl } from '@/utils/imageUrl';
+import Pagination from '@/components/admin/Pagination';
 
 interface Review {
     id: string;
@@ -35,17 +36,32 @@ const ReviewManagement = () => {
     const [filterRating, setFilterRating] = useState('');
     const [filterVisible, setFilterVisible] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
+    const [total, setTotal] = useState<number>(0);
+    const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
     useEffect(() => {
         fetchReviews();
-    }, []);
+    }, [currentPage, searchTerm, filterRating, filterVisible, itemsPerPage]);
 
     const fetchReviews = async () => {
         try {
             setLoading(true);
-            const response = await api.get('/reviews');
+            const params = new URLSearchParams();
+            params.append('page', currentPage.toString());
+            params.append('limit', itemsPerPage.toString());
+            if (searchTerm) params.append('search', searchTerm);
+            if (filterRating) params.append('rating', filterRating);
+            if (filterVisible !== '') params.append('is_visible', filterVisible);
+
+            const response = await api.get(`/reviews?${params.toString()}`);
             const data = response.data.data;
             setReviews(data.reviews || []);
+            if (data.pagination) {
+                setTotalPages(data.pagination.totalPages || 1);
+                setTotal(data.pagination.total || 0);
+            }
         } catch (err: any) {
             setError('Không thể tải danh sách đánh giá');
             console.error('Fetch reviews error:', err);
@@ -75,6 +91,11 @@ const ReviewManagement = () => {
             alert(err.response?.data?.message ||
                 'Có lỗi xảy ra khi xóa đánh giá');
         }
+    };
+
+    const handleItemsPerPageChange = (newItemsPerPage: number) => {
+        setItemsPerPage(newItemsPerPage);
+        setCurrentPage(1);
     };
 
     const renderStars = (rating: number) => {
@@ -108,27 +129,6 @@ const ReviewManagement = () => {
         );
     };
 
-    const filteredReviews = reviews.filter((review) => {
-        const matchesSearch =
-            review.product.name.toLowerCase()
-                .includes(searchTerm.toLowerCase()) ||
-            review.customer.user.username.toLowerCase()
-                .includes(searchTerm.toLowerCase()) ||
-            review.comment?.toLowerCase()
-                .includes(searchTerm.toLowerCase());
-
-        const matchesRating =
-            !filterRating ||
-            review.rating === parseInt(filterRating);
-
-        const matchesVisible =
-            filterVisible === '' ||
-            (filterVisible === 'true' && review.is_visible) ||
-            (filterVisible === 'false' && !review.is_visible);
-
-        return matchesSearch && matchesRating && matchesVisible;
-    });
-
     if (loading) {
         return (
             <div className="flex items-center justify-center h-64">
@@ -154,7 +154,7 @@ const ReviewManagement = () => {
                     Quản lý đánh giá sản phẩm
                 </h1>
                 <div className="text-sm text-gray-600">
-                    Tổng số: {reviews.length} đánh giá
+                    Tổng số: {total} đánh giá
                 </div>
             </div>
 
@@ -166,7 +166,10 @@ const ReviewManagement = () => {
                         placeholder="Tìm kiếm theo sản phẩm, 
                             khách hàng, nội dung..."
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            setCurrentPage(1);
+                        }}
                         className="px-4 py-2 border border-gray-300 
                             rounded-lg focus:ring-2 
                             focus:ring-blue-500 focus:border-blue-500"
@@ -174,7 +177,10 @@ const ReviewManagement = () => {
 
                     <select
                         value={filterRating}
-                        onChange={(e) => setFilterRating(e.target.value)}
+                        onChange={(e) => {
+                            setFilterRating(e.target.value);
+                            setCurrentPage(1);
+                        }}
                         className="px-4 py-2 border border-gray-300 
                             rounded-lg focus:ring-2 
                             focus:ring-blue-500 focus:border-blue-500"
@@ -189,7 +195,10 @@ const ReviewManagement = () => {
 
                     <select
                         value={filterVisible}
-                        onChange={(e) => setFilterVisible(e.target.value)}
+                        onChange={(e) => {
+                            setFilterVisible(e.target.value);
+                            setCurrentPage(1);
+                        }}
                         className="px-4 py-2 border border-gray-300 
                             rounded-lg focus:ring-2 
                             focus:ring-blue-500 focus:border-blue-500"
@@ -203,7 +212,7 @@ const ReviewManagement = () => {
 
             {/* Reviews List */}
             <div className="bg-white rounded-lg shadow-md">
-                {filteredReviews.length === 0 ? (
+                {reviews.length === 0 ? (
                     <div className="text-center py-12">
                         <p className="text-gray-500">
                             Không tìm thấy đánh giá nào
@@ -211,7 +220,7 @@ const ReviewManagement = () => {
                     </div>
                 ) : (
                     <div className="divide-y divide-gray-200">
-                        {filteredReviews.map((review) => (
+                        {reviews.map((review) => (
                             <div key={review.id} className="p-6">
                                 <div className="flex items-start 
                                         justify-between">
@@ -316,6 +325,16 @@ const ReviewManagement = () => {
                         ))}
                     </div>
                 )}
+
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    total={total}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={setCurrentPage}
+                    onItemsPerPageChange={handleItemsPerPageChange}
+                    itemName="đánh giá"
+                />
             </div>
         </div>
     );

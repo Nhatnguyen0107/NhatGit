@@ -32,27 +32,6 @@ export interface PaymentStatus {
 }
 
 export const paymentService = {
-    // VNPay methods
-    createVNPayPayment: async (data: {
-        order_id: string | number;
-        amount: number;
-        return_url?: string;
-        ip_address?: string;
-    }) => {
-        const response = await api.post('/payments/vnpay/create', {
-            orderId: data.order_id,
-            amount: data.amount,
-            orderInfo: `Thanh toan don hang ${data.order_id}`
-        });
-        return { payment_url: response.data.data.paymentUrl };
-    },
-
-    // Xử lý kết quả VNPay
-    handleVNPayReturn: async (params: Record<string, string>) => {
-        const response = await api.post('/payments/vnpay/return', params);
-        return response.data.data;
-    },
-
     // PayPal methods
     createPayPalPayment: async (data: {
         order_id: string | number;
@@ -108,6 +87,44 @@ export const paymentService = {
             orderId: data.orderId,
             amount: data.amount
         });
+        return response.data.data;
+    },
+
+    // PayOS methods
+    createPayOSPayment: async (data: {
+        orderId: string | number;
+        amount: number;
+        description?: string;
+    }) => {
+        const response = await api.post('/payments/payos/create', {
+            orderId: data.orderId,
+            amount: data.amount,
+            description: data.description
+        });
+        return response.data.data;
+    },
+
+    getPayOSPaymentInfo: async (orderCode: string | number) => {
+        const response = await api.get(`/payments/payos/info/${orderCode}`);
+        return response.data.data;
+    },
+
+    // VNPay methods
+    createVNPayPayment: async (data: {
+        orderId: string | number;
+        amount: number;
+        description?: string;
+    }) => {
+        const response = await api.post('/payments/vnpay/create', {
+            orderId: data.orderId,
+            amount: data.amount,
+            description: data.description
+        });
+        return response.data.data;
+    },
+
+    getVNPayPaymentInfo: async (orderCode: string | number) => {
+        const response = await api.get(`/payments/vnpay/info/${orderCode}`);
         return response.data.data;
     },
 

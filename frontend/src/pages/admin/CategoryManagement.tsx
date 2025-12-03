@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '@/services/api';
 import { getImageUrl } from '@/utils/imageUrl';
+import Pagination from '@/components/admin/Pagination';
 
 interface Category {
     id: string;
@@ -15,6 +16,10 @@ const CategoryManagement = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [total, setTotal] = useState(0);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [showModal, setShowModal] = useState(false);
     const [selectedCategory, setSelectedCategory] =
         useState<Category | null>(null);
@@ -26,15 +31,23 @@ const CategoryManagement = () => {
 
     useEffect(() => {
         fetchCategories();
-    }, []);
+    }, [currentPage, searchTerm, itemsPerPage]);
 
     const fetchCategories = async () => {
         try {
             setLoading(true);
-            const response = await api.get('/categories');
-            // Backend trả về: { data: { categories: [], pagination: {} } }
-            const data = response.data?.data?.categories || [];
-            setCategories(Array.isArray(data) ? data : []);
+            const params = new URLSearchParams({
+                page: currentPage.toString(),
+                limit: itemsPerPage.toString(),
+                search: searchTerm
+            });
+            const response = await api.get(`/categories?${params}`);
+            const data = response.data?.data || {};
+            setCategories(data.categories || []);
+            if (data.pagination) {
+                setTotalPages(data.pagination.totalPages);
+                setTotal(data.pagination.total);
+            }
         } catch (err: any) {
             setError('Không thể tải danh sách danh mục');
             console.error('Fetch categories error:', err);
@@ -43,11 +56,10 @@ const CategoryManagement = () => {
         }
     };
 
-    const filteredCategories = categories.filter((category) =>
-        category.name?.toLowerCase().includes(
-            searchTerm.toLowerCase()
-        )
-    );
+    const handleItemsPerPageChange = (newItemsPerPage: number) => {
+        setItemsPerPage(newItemsPerPage);
+        setCurrentPage(1);
+    };
 
     const handleOpenModal = (category?: Category) => {
         if (category) {
@@ -175,7 +187,10 @@ const CategoryManagement = () => {
                     type="text"
                     placeholder="Tên danh mục..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        setCurrentPage(1);
+                    }}
                     className="w-full px-4 py-2 border 
                           border-gray-300 rounded-lg 
                           focus:ring-2 focus:ring-blue-500 
@@ -231,7 +246,7 @@ const CategoryManagement = () => {
                         </thead>
                         <tbody className="bg-white divide-y 
                               divide-gray-200">
-                            {filteredCategories.length === 0 ? (
+                            {categories.length === 0 ? (
                                 <tr>
                                     <td
                                         colSpan={6}
@@ -243,13 +258,13 @@ const CategoryManagement = () => {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredCategories.map((category, index) => (
+                                categories.map((category, index) => (
                                     <tr key={category.id}>
                                         <td className="px-6 py-4 
                                               whitespace-nowrap 
                                               text-sm 
                                               text-gray-900">
-                                            {index + 1}
+                                            {(currentPage - 1) * itemsPerPage + index + 1}
                                         </td>
                                         <td className="px-6 py-4 
                                               whitespace-nowrap">
@@ -320,6 +335,17 @@ const CategoryManagement = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination */}
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    total={total}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={setCurrentPage}
+                    onItemsPerPageChange={handleItemsPerPageChange}
+                    itemName="danh mục"
+                />
             </div>
 
             {/* Modal */}

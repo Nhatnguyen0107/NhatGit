@@ -5,39 +5,35 @@ import { authenticate } from '../middlewares/auth.middleware.js';
 const router = express.Router();
 const controller = new PaymentController();
 
+// PayOS routes
+router.post('/payos/create',
+    authenticate,
+    controller.createPayOSPayment.bind(controller)
+);
+
+router.post('/payos/confirm',
+    authenticate,
+    controller.confirmPayOSPayment.bind(controller)
+);
+
+router.post('/payos/webhook',
+    controller.handlePayOSWebhook.bind(controller)
+);
+
+router.get('/payos/info/:orderCode',
+    authenticate,
+    controller.getPayOSPaymentInfo.bind(controller)
+);
+
 // VNPay routes
 router.post('/vnpay/create',
     authenticate,
     controller.createVNPayPayment.bind(controller)
 );
 
-router.get('/vnpay/return',
-    controller.handleVNPayReturn.bind(controller)
-);
-
-// PayPal routes
-router.post('/paypal/create',
+router.post('/vnpay/confirm',
     authenticate,
-    controller.createPayPalPayment.bind(controller)
-);
-
-router.get('/paypal/success',
-    controller.handlePayPalSuccess.bind(controller)
-);
-
-router.get('/paypal/cancel',
-    controller.handlePayPalCancel.bind(controller)
-);
-
-// VietQR routes
-router.post('/vietqr/create',
-    authenticate,
-    controller.createVietQRPayment.bind(controller)
-);
-
-router.post('/vietqr/check',
-    authenticate,
-    controller.checkVietQRPayment.bind(controller)
+    controller.confirmVNPayPayment.bind(controller)
 );
 
 // General payment routes

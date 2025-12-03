@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '@/services/api';
+import Pagination from '@/components/admin/Pagination';
 
 interface User {
     id: string;
@@ -24,6 +25,10 @@ const UserManagement = () => {
     const [roleFilter, setRoleFilter] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [total, setTotal] = useState(0);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -35,24 +40,26 @@ const UserManagement = () => {
 
     useEffect(() => {
         fetchUsers();
-    }, []);
+    }, [currentPage, searchTerm, roleFilter, itemsPerPage]);
 
     const fetchUsers = async () => {
         try {
             setLoading(true);
-            // Fetch all users (both customers and admins)
-            const response = await api.get('/auth/users');
-            const data = response.data?.data || [];
-            setUsers(Array.isArray(data) ? data : []);
-        } catch (err: any) {
-            // Fallback to customers if users endpoint doesn't exist
-            try {
-                const response = await api.get('/customers');
-                const data = response.data?.data || [];
-                setUsers(Array.isArray(data) ? data : []);
-            } catch {
-                setError('Không thể tải danh sách người dùng');
+            const params = new URLSearchParams({
+                page: currentPage.toString(),
+                limit: itemsPerPage.toString(),
+                search: searchTerm,
+                ...(roleFilter && { role_id: roleFilter })
+            });
+            const response = await api.get(`/auth/users?${params}`);
+            const data = response.data?.data || {};
+            setUsers(data.users || []);
+            if (data.pagination) {
+                setTotalPages(data.pagination.totalPages);
+                setTotal(data.pagination.total);
             }
+        } catch (err: any) {
+            setError('Không thể tải danh sách người dùng');
             console.error('Fetch users error:', err);
         } finally {
             setLoading(false);
@@ -85,27 +92,10 @@ const UserManagement = () => {
         return status === 'active' ? 'Hoạt động' : 'Không hoạt động';
     };
 
-    const filteredUsers = users.filter((user) => {
-        const fullName = user.customer
-            ? `${user.customer.first_name || ''} ${user.customer.last_name || ''}`.trim()
-            : '';
-        const matchesSearch =
-            user.username?.toLowerCase().includes(
-                searchTerm.toLowerCase()
-            ) ||
-            user.email?.toLowerCase().includes(
-                searchTerm.toLowerCase()
-            ) ||
-            fullName.toLowerCase().includes(
-                searchTerm.toLowerCase()
-            );
-
-        const matchesRole = roleFilter
-            ? user.role_id === parseInt(roleFilter)
-            : true;
-
-        return matchesSearch && matchesRole;
-    });
+    const handleItemsPerPageChange = (newItemsPerPage: number) => {
+        setItemsPerPage(newItemsPerPage);
+        setCurrentPage(1); // Reset to first page
+    };
 
     const handleOpenModal = (user?: User) => {
         if (user) {
@@ -265,9 +255,10 @@ const UserManagement = () => {
                             type="text"
                             placeholder="Tên, email, số điện thoại..."
                             value={searchTerm}
-                            onChange={(e) =>
-                                setSearchTerm(e.target.value)
-                            }
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setCurrentPage(1);
+                            }}
                             className="w-full px-4 py-2 border 
                                   border-gray-300 rounded-lg 
                                   focus:ring-2 focus:ring-blue-500 
@@ -281,9 +272,10 @@ const UserManagement = () => {
                         </label>
                         <select
                             value={roleFilter}
-                            onChange={(e) =>
-                                setRoleFilter(e.target.value)
-                            }
+                            onChange={(e) => {
+                                setRoleFilter(e.target.value);
+                                setCurrentPage(1);
+                            }}
                             className="w-full px-4 py-2 border 
                                   border-gray-300 rounded-lg 
                                   focus:ring-2 focus:ring-blue-500 
@@ -331,17 +323,17 @@ const UserManagement = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {filteredUsers.length === 0 ? (
+                            {users.length === 0 ? (
                                 <tr>
                                     <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                                         Không tìm thấy người dùng nào
                                     </td>
                                 </tr>
                             ) : (
-                                filteredUsers.map((user, index) => (
+                                users.map((user, index) => (
                                     <tr key={user.id} className="hover:bg-gray-50">
                                         <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {index + 1}
+                                            {(currentPage - 1) * itemsPerPage + index + 1}
                                         </td>
                                         <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
                                             {user.username}
@@ -385,6 +377,17 @@ const UserManagement = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination */}
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    total={total}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={setCurrentPage}
+                    onItemsPerPageChange={handleItemsPerPageChange}
+                    itemName="người dùng"
+                />
             </div>
 
             {/* Modal */}
